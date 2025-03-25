@@ -1,6 +1,11 @@
-#Importar bibliotecas requests y BeautifulSoup
+#Importar bibliotecas requests, BeautifulSoup y base de datos SQLITE
 import requests
 from bs4 import BeautifulSoup
+import sqlite3
+
+#Crear conexión a la base de datos y crear cursor
+conexion = sqlite3.connect('base1')
+cursor01 = conexion.cursor()
 
 #Declaración y asignación de las variables para las dos urls
 url_spain= "https://es.wikipedia.org/wiki/Espa%C3%B1a"
@@ -30,6 +35,12 @@ p_spain= a_spain.find_next('p')
 PIB_spain = p_spain.text
 print(PIB_spain) 
 
+#Subir los datos a la base de datos.
+dato_spain = ('Spain', poblacion_spain, PIB_spain)
+consulta = "INSERT INTO Spain ('Pais', 'Poblacion', 'PIB') values (?,?,?)"
+cursor01.execute (consulta, dato_spain)
+conexion.commit()
+
 #Crear objeto con la información de la web para Venezuela y crear el objeto donde se almacena la información en formato texto
 respuesta_venezuela= requests.get(url_venezuela)
 soup_venezuela = BeautifulSoup(respuesta_venezuela.text, "html.parser")
@@ -53,3 +64,12 @@ p_venezuela = a_venezuela.find_next('p')
 #Imprimir el PIB de Venezuela. He tenido que poner encode utf-8 porque me da problemas con algunas letras
 PIB_venezuela = p_venezuela.text
 print(PIB_venezuela)
+
+#Subir los datos a la base de datos.
+dato_venezuela = ('Venezuela', poblacion_venezuela, PIB_venezuela)
+consulta2 = "INSERT INTO Venezuela ('Pais', 'Poblacion', 'PIB') values (?,?,?)"
+cursor01.execute (consulta2, dato_venezuela)
+conexion.commit()
+
+#Desconectar base de datos.
+conexion.close()
